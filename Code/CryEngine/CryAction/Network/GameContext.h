@@ -224,8 +224,6 @@ public:
 
 	void        AllowCallOnClientConnect();
 
-	void        PlayerIdSet(EntityId id);
-
 	void        GetMemoryUsage(ICrySizer* pSizer) const;
 	void        GetMemoryStatistics(ICrySizer* pSizer) { GetMemoryUsage(pSizer); /*dummy till network module is updated*/ }
 	void        LockResources();
@@ -262,7 +260,7 @@ private:
 	};
 
 	static const int EstablishmentFlags_InitialLoad = eEF_LoadNewLevel;
-	static const int EstablishmentFlags_LoadNextLevel = eEF_LoadNewLevel;
+	static const int EstablishmentFlags_LoadNextLevel = eEF_LoadNewLevel | eEF_LevelLoaded;
 	static const int EstablishmentFlags_ResetMap = eEF_LevelLoaded;
 
 	int              m_loadFlags;

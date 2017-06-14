@@ -12,7 +12,7 @@ namespace
 {
 bool GetVolumeInfoForEntity(EntityId entityId, IGameVolumes::VolumeInfo& volumeInfo)
 {
-	IGameVolumes* pGameVolumesMgr = gEnv->pGame->GetIGameFramework()->GetIGameVolumesManager();
+	IGameVolumes* pGameVolumesMgr = gEnv->pGameFramework->GetIGameVolumesManager();
 	if (pGameVolumesMgr != NULL)
 	{
 		return pGameVolumesMgr->GetVolumeInfoForEntity(entityId, &volumeInfo);
@@ -98,13 +98,6 @@ bool CGameVolume_Water::ReloadExtension(IGameObject* pGameObject, const SEntityS
 	CRY_ASSERT_MESSAGE(false, "CGameVolume_Water::ReloadExtension not implemented");
 
 	return false;
-}
-
-bool CGameVolume_Water::GetEntityPoolSignature(TSerialize signature)
-{
-	CRY_ASSERT_MESSAGE(false, "CGameVolume_Water::GetEntityPoolSignature not implemented");
-
-	return true;
 }
 
 void CGameVolume_Water::Release()
@@ -284,6 +277,16 @@ void CGameVolume_Water::ProcessEvent(SEntityEvent& event)
 	}
 }
 
+uint64 CGameVolume_Water::GetEventMask() const
+{
+	return 
+		BIT64(ENTITY_EVENT_EDITOR_PROPERTY_CHANGED) |
+		BIT64(ENTITY_EVENT_RESET) |
+		BIT64(ENTITY_EVENT_XFORM) |
+		BIT64(ENTITY_EVENT_HIDE) |
+		BIT64(ENTITY_EVENT_UNHIDE);
+}
+
 void CGameVolume_Water::GetMemoryUsage(ICrySizer* pSizer) const
 {
 	pSizer->AddObject(this, sizeof(*this));
@@ -304,14 +307,14 @@ void CGameVolume_Water::SetupVolume()
 	if (GetVolumeInfoForEntity(GetEntityId(), volumeInfo) == false)
 		return;
 
-	if (volumeInfo.verticesCount < 3)
+	if (volumeInfo.verticesCount < 4)
 		return;
 
 	WaterProperties waterProperties(GetEntity());
 
 	if (waterProperties.isRiver)
 	{
-		if (volumeInfo.verticesCount < 4 || volumeInfo.verticesCount % 2 != 0)
+		if (volumeInfo.verticesCount % 2 != 0)
 			return;
 
 		int numSegments = (volumeInfo.verticesCount / 2) - 1;

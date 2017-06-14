@@ -338,6 +338,12 @@ const IAnimationDatabase* CAnimationDatabaseManager::FindDatabase(uint32 crcFile
 
 const IAnimationDatabase* CAnimationDatabaseManager::Load(const char* databaseName)
 {
+	//Don't load if there is no database
+	if (databaseName == nullptr || strlen(databaseName) == 0)
+	{
+		return nullptr;
+	}
+
 	MEMSTAT_CONTEXT_FMT(EMemStatContextTypes::MSC_Mannequin, 0, "Load ADB: %s", databaseName);
 
 	const IAnimationDatabase* pDb = CAnimationDatabaseLibrary::LoadResource(databaseName, 0);
@@ -1076,8 +1082,8 @@ void CAnimationDatabaseLibrary::ProceduralToXml(XmlNodeRef pOutNode, const SProc
 
 bool CAnimationDatabaseLibrary::XmlToProcedural(XmlNodeRef pInNode, SProceduralEntry& outProceduralEntry) const
 {
-	CRY_ASSERT(gEnv && gEnv->pGame && gEnv->pGame->GetIGameFramework());
-	const IProceduralClipFactory& proceduralClipFactory = gEnv->pGame->GetIGameFramework()->GetMannequinInterface().GetProceduralClipFactory();
+	CRY_ASSERT(gEnv && gEnv->pGameFramework);
+	const IProceduralClipFactory& proceduralClipFactory = gEnv->pGameFramework->GetMannequinInterface().GetProceduralClipFactory();
 
 	const char* const typeName = pInNode->getAttr("type");
 	const char* const safeTypeName = typeName ? typeName : "";
@@ -1506,7 +1512,7 @@ bool CAnimationDatabaseLibrary::LoadDatabaseDefinitions(const XmlNodeRef& root, 
 	szBuffer = root->getAttr("Def");
 	if (szBuffer && szBuffer[0])
 	{
-		const SControllerDef* def = gEnv->pGame->GetIGameFramework()->GetMannequinInterface().GetAnimationDatabaseManager().LoadControllerDef(szBuffer);
+		const SControllerDef* def = gEnv->pGameFramework->GetMannequinInterface().GetAnimationDatabaseManager().LoadControllerDef(szBuffer);
 		if (def)
 		{
 			*ppFragDefs = &def->m_fragmentIDs;
@@ -1523,7 +1529,7 @@ bool CAnimationDatabaseLibrary::LoadDatabaseDefinitions(const XmlNodeRef& root, 
 	szBuffer = root->getAttr("FragDef");
 	if (szBuffer && szBuffer[0])
 	{
-		*ppFragDefs = gEnv->pGame->GetIGameFramework()->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, false);
+		*ppFragDefs = gEnv->pGameFramework->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, false);
 	}
 
 	if (*ppFragDefs == NULL)
@@ -1535,7 +1541,7 @@ bool CAnimationDatabaseLibrary::LoadDatabaseDefinitions(const XmlNodeRef& root, 
 	szBuffer = root->getAttr("TagDef");
 	if (szBuffer && szBuffer[0])
 	{
-		*ppTagDefs = gEnv->pGame->GetIGameFramework()->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, true);
+		*ppTagDefs = gEnv->pGameFramework->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, true);
 	}
 
 	if (*ppTagDefs == NULL)
@@ -1942,13 +1948,13 @@ SControllerDef* CAnimationControllerDefLibrary::LoadControllerDef(const XmlNodeR
 	szBuffer = tagList ? tagList->getAttr("filename") : NULL;
 	if (szBuffer)
 	{
-		tagTD = gEnv->pGame->GetIGameFramework()->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, true);
+		tagTD = gEnv->pGameFramework->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, true);
 	}
 	XmlNodeRef fragList = root->findChild("Fragments");
 	szBuffer = fragList ? fragList->getAttr("filename") : NULL;
 	if (szBuffer)
 	{
-		fragmentTD = gEnv->pGame->GetIGameFramework()->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, false);
+		fragmentTD = gEnv->pGameFramework->GetMannequinInterface().GetAnimationDatabaseManager().LoadTagDefs(szBuffer, false);
 	}
 
 	{

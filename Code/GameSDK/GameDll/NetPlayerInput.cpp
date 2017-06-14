@@ -531,14 +531,16 @@ void CNetPlayerInput::UpdateMoveRequest()
 
 	float fRotZDirDot	= vNewProjected.dot(vCurrentRight);
 	float fRotZDot		= vNewProjected.dot(vCurrentProjected);
-	float fRotZ				= acos_tpl(fRotZDot);
+	float fRotZ			= crymath::acos(crymath::clamp(fRotZDot, -1.0f, 1.0f));
 
 	fRotZ = AngleWrap_PI(fRotZ);
 
 	float fRotZFinal	= -fsgnf(fRotZDirDot) * fRotZ * fNetAimLerpFactor;
 
-	float fCurrentAngle = acos_tpl(Vec3Constants<float>::fVec3_OneZ.dot(m_lookDir));
-	float fNewAngle			= acos_tpl(Vec3Constants<float>::fVec3_OneZ.dot(m_curInput.lookDirection));
+	float fCurrentAngle = crymath::acos(crymath::clamp(
+		Vec3Constants<float>::fVec3_OneZ.dot(m_lookDir), -1.0f, 1.0f));
+	float fNewAngle		= crymath::acos(crymath::clamp(
+		Vec3Constants<float>::fVec3_OneZ.dot(m_curInput.lookDirection), -1.0f, 1.0f));
 
 	float fRotXFinal = (fNewAngle - fCurrentAngle) * -fNetAimLerpFactor;
 
@@ -603,7 +605,7 @@ void CNetPlayerInput::UpdateMoveRequest()
 	// debug..
 	if (g_pGameCVars->g_debugNetPlayerInput & 2)
 	{
-		IPersistantDebug * pPD = gEnv->pGame->GetIGameFramework()->GetIPersistantDebug();
+		IPersistantDebug * pPD = gEnv->pGameFramework->GetIPersistantDebug();
 		pPD->Begin( string("update_player_input_") + m_pPlayer->GetEntity()->GetName(), true );
 		Vec3 wp = m_pPlayer->GetEntity()->GetWorldPos();
 		wp.z += 2.0f;
@@ -693,7 +695,7 @@ float CNetPlayerInput::CalculatePseudoSpeed() const
 	const float XPOS = 500.0f;
 	const float YPOS = 100.0f;
 	const float COLOUR[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	gEnv->pRenderer->Draw2dLabel(XPOS, YPOS, 2.0f, COLOUR, false, "CurSpeed: %.2f CurISpeed: %f PS: %.2f", actualSpeed, inputSpeed, pseudoSpeed);
+	IRenderAuxText::Draw2dLabel(XPOS, YPOS, 2.0f, COLOUR, false, "CurSpeed: %.2f CurISpeed: %f PS: %.2f", actualSpeed, inputSpeed, pseudoSpeed);
 #endif 
 
 	return pseudoSpeed;
@@ -742,7 +744,7 @@ void CNetPlayerInput::DoSetState(const SSerializedPlayerInput& input )
 	// debug..
 	if (g_pGameCVars->g_debugNetPlayerInput & 1)
 	{
-		IPersistantDebug * pPD = gEnv->pGame->GetIGameFramework()->GetIPersistantDebug();
+		IPersistantDebug * pPD = gEnv->pGameFramework->GetIPersistantDebug();
 		pPD->Begin( string("net_player_input_") + m_pPlayer->GetEntity()->GetName(), true );
 		pPD->AddSphere( moveRequest.GetLookTarget(), 0.5f, ColorF(1,0,1,1), 1.0f );
 		//			pPD->AddSphere( moveRequest.GetMoveTarget(), 0.5f, ColorF(1,1,0,1), 1.0f );

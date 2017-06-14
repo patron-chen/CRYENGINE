@@ -239,7 +239,7 @@ void CDedicatedInput::GiveItems()
 		nameIdx = cry_random(0, numberItems - 1);
 	}
 
-	IGameFramework *pGameFramework = gEnv->pGame->GetIGameFramework();
+	IGameFramework *pGameFramework = gEnv->pGameFramework;
 	IItemSystem		*pItemSystem = pGameFramework->GetIItemSystem();
 
 	//Check item name before giving (it will resolve case sensitive 'issues')
@@ -528,7 +528,7 @@ void CDedicatedInput::HandleDeathAndSuicide(CGameRules* const pGameRules)
 
 			IGameRulesSpawningModule *pSpawningModule = pGameRules->GetSpawningModule();
 
-			if (pSpawningModule)
+			if (pSpawningModule && pSpawningModule->GetRemainingLives(m_pPlayer->GetEntityId()) > 0)
 			{
 				pSpawningModule->ClRequestRevive(m_pPlayer->GetEntityId());
 			}

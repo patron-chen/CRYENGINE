@@ -337,6 +337,7 @@ GFxLoader2::GFxLoader2()
 	SetImageCreator(&CryGFxImageCreator::GetAccess());
 	SetImageLoader(&CryGFxImageLoader::GetAccess());
 	SetTranslator(&CryGFxTranslator::GetAccess());
+	SetTextClipboard(&CryGFxTextClipboard::GetAccess());
 
 	// enable dynamic font cache
 	SetupDynamicFontCache();
@@ -359,6 +360,22 @@ GFxLoader2::GFxLoader2()
 
 GFxLoader2::~GFxLoader2()
 {
+	SetLog(nullptr);
+	//SetFileOpener(nullptr);
+	SetURLBuilder(nullptr);
+	SetImageCreator(nullptr);
+	SetImageLoader(nullptr);
+	SetTranslator(nullptr);
+	SetTextClipboard(nullptr);
+
+	CryGFxLog::GetAccess().Release();
+	//CryGFxFileOpener::GetAccess().Release();
+	CryGFxURLBuilder::GetAccess().Release();
+	CryGFxImageCreator::GetAccess().Release();
+	CryGFxImageLoader::GetAccess().Release();
+	CryGFxTranslator::GetAccess().Release();
+	CryGFxTextClipboard::GetAccess().Release();
+
 	SetParseControl(0);
 }
 
